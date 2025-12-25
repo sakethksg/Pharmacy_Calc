@@ -5,9 +5,12 @@
  * Dynamic table for adding/editing/removing production stages
  */
 
+import { useState, useEffect } from 'react';
+
 export default function StageInput({ stages, onChange }) {
   const addStage = () => {
     const newStage = {
+      id: Date.now(), // Add unique ID for each stage
       name: `Stage-${stages.length + 1}`,
       inputPerBatch: 100,
       outputPerBatch: 100,
@@ -15,6 +18,8 @@ export default function StageInput({ stages, onChange }) {
       duration: 24,
       analysisDuration: 24,
     };
+    console.log('Adding new stage:', newStage);
+    console.log('Current stages count:', stages.length);
     onChange([...stages, newStage]);
   };
 
@@ -63,7 +68,7 @@ export default function StageInput({ stages, onChange }) {
           </thead>
           <tbody>
             {stages.map((stage, index) => (
-              <tr key={index} className="border-t border-gray-200 hover:bg-gray-50">
+              <tr key={stage.id || index} className="border-t border-gray-200 hover:bg-gray-50">
                 <td className="px-4 py-3 text-sm font-medium text-gray-700">
                   {index + 1}
                 </td>

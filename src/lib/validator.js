@@ -117,16 +117,7 @@ export function checkLogicalWarnings(validatedData) {
     });
   }
 
-  // Check for stages with loss (output < input)
-  validatedData.stages.forEach((stage, idx) => {
-    if (stage.outputPerBatch < stage.inputPerBatch) {
-      const loss = ((1 - stage.outputPerBatch / stage.inputPerBatch) * 100).toFixed(1);
-      warnings.push({
-        type: 'info',
-        message: `Stage ${idx + 1} has ${loss}% material loss`,
-      });
-    }
-  });
+  // Material loss information removed - not needed
 
   // Check for very long analysis times
   validatedData.stages.forEach((stage, idx) => {

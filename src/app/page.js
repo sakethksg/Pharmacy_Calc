@@ -21,6 +21,7 @@ export default function Home() {
   
   const [stages, setStages] = useState([
     {
+      id: Date.now(),
       name: 'Stage-1',
       inputPerBatch: 200,
       outputPerBatch: 250,
@@ -29,6 +30,7 @@ export default function Home() {
       analysisDuration: 24,
     },
     {
+      id: Date.now() + 1,
       name: 'Stage-2',
       inputPerBatch: 300,
       outputPerBatch: 180,
@@ -50,6 +52,9 @@ export default function Home() {
     setResults(null);
 
     try {
+      // Remove the 'id' field from stages before sending to API
+      const cleanStages = stages.map(({ id, ...stage }) => stage);
+      
       const response = await fetch('/api/calculate', {
         method: 'POST',
         headers: {
@@ -59,7 +64,7 @@ export default function Home() {
           productName,
           targetFinalOutput: targetOutput,
           startDate,
-          stages,
+          stages: cleanStages,
         }),
       });
 
