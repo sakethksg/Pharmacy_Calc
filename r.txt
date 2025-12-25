@@ -1,0 +1,3 @@
+add dispatch , print (id , data) , ask for pack time 
+fix total batch 2 should use only batch 1 have got not round off and take . 
+

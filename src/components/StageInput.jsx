@@ -17,6 +17,7 @@ export default function StageInput({ stages, onChange }) {
       frequency: 24,
       duration: 24,
       analysisDuration: 24,
+      packTime: 0,
     };
     console.log('Adding new stage:', newStage);
     console.log('Current stages count:', stages.length);
@@ -135,13 +136,24 @@ export default function StageInput({ stages, onChange }) {
                   step="1"
                 />
               </div>
-              <div className="col-span-2">
+              <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Analysis (hrs)</label>
                 <input
                   type="number"
                   value={stage.analysisDuration}
                   onChange={(e) => updateStage(index, 'analysisDuration', parseFloat(e.target.value) || 0)}
                   className="w-full px-3 py-2 border-2 border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 bg-white"
+                  min="0"
+                  step="1"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Pack Time (hrs)</label>
+                <input
+                  type="number"
+                  value={stage.packTime || 0}
+                  onChange={(e) => updateStage(index, 'packTime', parseFloat(e.target.value) || 0)}
+                  className="w-full px-3 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                   min="0"
                   step="1"
                 />
@@ -163,6 +175,7 @@ export default function StageInput({ stages, onChange }) {
               <th className="px-4 py-3 text-left text-sm font-bold">Frequency (hrs)</th>
               <th className="px-4 py-3 text-left text-sm font-bold">Duration (hrs)</th>
               <th className="px-4 py-3 text-left text-sm font-bold">Analysis (hrs)</th>
+              <th className="px-4 py-3 text-left text-sm font-bold">Pack Time (hrs)</th>
               <th className="px-4 py-3 text-center text-sm font-bold">Actions</th>
             </tr>
           </thead>
@@ -229,6 +242,16 @@ export default function StageInput({ stages, onChange }) {
                     value={stage.analysisDuration}
                     onChange={(e) => updateStage(index, 'analysisDuration', parseFloat(e.target.value) || 0)}
                     className="w-24 px-3 py-2 border-2 border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                    min="0"
+                    step="1"
+                  />
+                </td>
+                <td className="px-4 py-3">
+                  <input
+                    type="number"
+                    value={stage.packTime || 0}
+                    onChange={(e) => updateStage(index, 'packTime', parseFloat(e.target.value) || 0)}
+                    className="w-24 px-3 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                     min="0"
                     step="1"
                   />

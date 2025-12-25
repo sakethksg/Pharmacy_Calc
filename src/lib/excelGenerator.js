@@ -144,13 +144,16 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
     { width: 20 }, // Start
     { width: 20 }, // Completion
     { width: 20 }, // Analysis Done
+    { width: 20 }, // Pack Time
+    { width: 20 }, // Print Time
+    { width: 20 }, // Dispatch Time
     { width: 15 }, // Input
     { width: 15 }, // Output
     { width: 15 }, // Cumulative
   ];
 
   // Title
-  sheet.mergeCells('A1:G1');
+  sheet.mergeCells('A1:J1');
   const titleCell = sheet.getCell('A1');
   titleCell.value = `${stageSchedule.stageName} - Batch Schedule`;
   titleCell.font = { size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
@@ -176,7 +179,7 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
   };
 
   // Headers
-  const headers = ['Batch No', 'Start Time', 'Completion Time', 'Analysis Done', 'Input (kg)', 'Output (kg)', 'Cumulative (kg)'];
+  const headers = ['Batch No', 'Start Time', 'Completion Time', 'Analysis Done', 'Pack Time', 'Print Time', 'Dispatch Time', 'Input (kg)', 'Output (kg)', 'Cumulative (kg)'];
   sheet.getRow(3).values = headers;
   sheet.getRow(3).font = { bold: true, color: { argb: 'FFFFFFFF' } };
   sheet.getRow(3).fill = {
@@ -195,6 +198,9 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
       batch.startTimeFormatted,
       batch.completionTimeFormatted,
       batch.analysisDoneTimeFormatted,
+      batch.packTimeFormatted,
+      batch.printTimeFormatted,
+      batch.dispatchTimeFormatted,
       batch.inputQuantity,
       batch.outputQuantity,
       batch.cumulativeOutput,
@@ -213,7 +219,7 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
   // Apply borders to all cells
   const lastRow = 3 + stageSchedule.batches.length;
   for (let row = 2; row <= lastRow; row++) {
-    for (let col = 1; col <= 7; col++) {
+    for (let col = 1; col <= 10; col++) {
       const cell = sheet.getCell(row, col);
       cell.border = {
         top: { style: 'thin' },

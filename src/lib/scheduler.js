@@ -48,10 +48,11 @@ export function scheduleBatches(calculationResults, startDate) {
           batchStartTime = earliestByFrequency;
         } else {
           // Downstream stages must also check material availability
-          const materialNeeded = stage.inputPerBatch;
+          // Calculate exact cumulative material needed based on actual input consumed
+          const cumulativeMaterialNeeded = stage.inputPerBatch * batchNum;
           const materialAvailableTime = waitForMaterial(
             scheduledStages[stageIdx - 1].batches,
-            materialNeeded * batchNum, // Cumulative material needed
+            cumulativeMaterialNeeded, // Use exact cumulative amount
             earliestByFrequency
           );
 
@@ -64,6 +65,9 @@ export function scheduleBatches(calculationResults, startDate) {
 
       const completionTime = addHours(batchStartTime, stage.duration);
       const analysisDoneTime = addHours(completionTime, stage.analysisDuration);
+      const packTime = addHours(analysisDoneTime, stage.packTime || 0);
+      const printTime = addHours(packTime, 0); // Print happens after packing
+      const dispatchTime = addHours(printTime, 0); // Dispatch happens after printing
 
       cumulativeOutput += stage.outputPerBatch;
 
@@ -76,6 +80,12 @@ export function scheduleBatches(calculationResults, startDate) {
         completionTimeFormatted: format(completionTime, 'dd-MM-yyyy'),
         analysisDoneTime: analysisDoneTime,
         analysisDoneTimeFormatted: format(analysisDoneTime, 'dd-MM-yyyy'),
+        packTime: packTime,
+        packTimeFormatted: format(packTime, 'dd-MM-yyyy'),
+        printTime: printTime,
+        printTimeFormatted: format(printTime, 'dd-MM-yyyy'),
+        dispatchTime: dispatchTime,
+        dispatchTimeFormatted: format(dispatchTime, 'dd-MM-yyyy'),
         inputQuantity: stage.inputPerBatch,
         outputQuantity: stage.outputPerBatch,
         cumulativeOutput: cumulativeOutput,
@@ -122,9 +132,10 @@ function waitForMaterial(upstreamBatches, materialNeeded, earliestTime) {
   for (const batch of upstreamBatches) {
     cumulativeAvailable += batch.outputQuantity;
 
+    // Use exact accumulated output, no rounding
     if (cumulativeAvailable >= materialNeeded) {
-      // Material is available after this batch's analysis is done
-      const materialAvailableTime = batch.analysisDoneTime;
+      // Material is available after this batch's pack time is done
+      const materialAvailableTime = batch.packTime || batch.analysisDoneTime;
 
       // Return the later of material available time and earliest allowed time
       return new Date(Math.max(
@@ -136,9 +147,9 @@ function waitForMaterial(upstreamBatches, materialNeeded, earliestTime) {
 
   // If we get here, not enough material will ever be available
   // This shouldn't happen if calculations are correct
-  // Return the analysis done time of the last batch
+  // Return the pack time of the last batch
   if (upstreamBatches.length > 0) {
-    return upstreamBatches[upstreamBatches.length - 1].analysisDoneTime;
+    return upstreamBatches[upstreamBatches.length - 1].packTime || upstreamBatches[upstreamBatches.length - 1].analysisDoneTime;
   }
 
   return earliestTime;

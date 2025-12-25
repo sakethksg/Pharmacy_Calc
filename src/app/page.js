@@ -28,6 +28,7 @@ export default function Home() {
       frequency: 24,
       duration: 24,
       analysisDuration: 24,
+      packTime: 0,
     },
     {
       id: Date.now() + 1,
@@ -37,6 +38,7 @@ export default function Home() {
       frequency: 24,
       duration: 24,
       analysisDuration: 24,
+      packTime: 0,
     },
   ]);
 

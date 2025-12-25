@@ -13,6 +13,7 @@ export const stageSchema = z.object({
   frequency: z.number().positive('Batch frequency must be positive'),
   duration: z.number().positive('Batch duration must be positive'),
   analysisDuration: z.number().min(0, 'Analysis duration cannot be negative'),
+  packTime: z.number().min(0, 'Pack time cannot be negative').optional().default(0),
 }).refine((data) => data.frequency >= data.duration, {
   message: 'Batch frequency must be greater than or equal to batch duration',
   path: ['frequency'],

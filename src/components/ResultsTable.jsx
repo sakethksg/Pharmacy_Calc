@@ -73,6 +73,9 @@ export default function ResultsTable({ results }) {
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Start Time</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Completion Time</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Analysis Done</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Pack Time</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Print Time</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dispatch Time</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Input (kg)</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Output (kg)</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Cumulative (kg)</th>
@@ -88,6 +91,9 @@ export default function ResultsTable({ results }) {
                     <td className="px-4 py-3 text-sm text-gray-700">{batch.startTimeFormatted}</td>
                     <td className="px-4 py-3 text-sm text-gray-700">{batch.completionTimeFormatted}</td>
                     <td className="px-4 py-3 text-sm text-gray-700">{batch.analysisDoneTimeFormatted}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{batch.packTimeFormatted}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{batch.printTimeFormatted}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{batch.dispatchTimeFormatted}</td>
                     <td className="px-4 py-3 text-sm text-right text-gray-700">{batch.inputQuantity}</td>
                     <td className="px-4 py-3 text-sm text-right text-gray-700">{batch.outputQuantity}</td>
                     <td className="px-4 py-3 text-sm text-right font-medium text-gray-900">{batch.cumulativeOutput}</td>
