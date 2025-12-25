@@ -28,6 +28,7 @@ export async function POST(request) {
       startDate: body.startDate,
       calculationResults: body.calculationResults,
       scheduleResults: body.scheduleResults,
+      dispatchSchedule: body.dispatchSchedule,
       efficiency: body.efficiency,
     });
 
