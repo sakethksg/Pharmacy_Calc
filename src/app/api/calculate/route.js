@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { validateProductionPlan, checkLogicalWarnings } from '@/lib/validator';
 import { calculateBackward, calculateEfficiency } from '@/lib/calculator';
 import { scheduleBatches, formatScheduleSummary } from '@/lib/scheduler';
+import { scheduleDispatches } from '@/lib/dispatchScheduler';
 import { parse } from 'date-fns';
 
 export async function POST(request) {
@@ -51,14 +52,25 @@ export async function POST(request) {
     // Format summary
     const summary = formatScheduleSummary(scheduleResults);
 
+    // Generate dispatch schedule from final stage
+    const finalStage = scheduleResults.stages[scheduleResults.stages.length - 1];
+    const dispatchSchedule = scheduleDispatches(
+      finalStage.batches,
+      data.dispatchBatchQuantity || 500,
+      data.packingTime || 8
+    );
+
     return NextResponse.json({
       success: true,
       data: {
         productName: data.productName,
         targetFinalOutput: data.targetFinalOutput,
         startDate: data.startDate,
+        dispatchBatchQuantity: data.dispatchBatchQuantity,
+        packingTime: data.packingTime,
         calculationResults,
         scheduleResults,
+        dispatchSchedule,
         efficiency,
         summary,
         warnings,

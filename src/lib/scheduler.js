@@ -67,7 +67,6 @@ export function scheduleBatches(calculationResults, startDate) {
       const analysisDoneTime = addHours(completionTime, stage.analysisDuration);
       const packTime = addHours(analysisDoneTime, stage.packTime || 0);
       const printTime = addHours(packTime, 0); // Print happens after packing
-      const dispatchTime = addHours(printTime, 0); // Dispatch happens after printing
 
       cumulativeOutput += stage.outputPerBatch;
 
@@ -84,8 +83,6 @@ export function scheduleBatches(calculationResults, startDate) {
         packTimeFormatted: format(packTime, 'dd-MM-yyyy'),
         printTime: printTime,
         printTimeFormatted: format(printTime, 'dd-MM-yyyy'),
-        dispatchTime: dispatchTime,
-        dispatchTimeFormatted: format(dispatchTime, 'dd-MM-yyyy'),
         inputQuantity: stage.inputPerBatch,
         outputQuantity: stage.outputPerBatch,
         cumulativeOutput: cumulativeOutput,

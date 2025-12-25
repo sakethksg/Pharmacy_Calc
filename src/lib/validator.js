@@ -29,6 +29,8 @@ export const productionPlanSchema = z.object({
     /^\d{4}-\d{2}-\d{2}$/,
     'Start date must be in YYYY-MM-DD format'
   ),
+  dispatchBatchQuantity: z.number().positive('Dispatch batch quantity must be positive').optional().default(500),
+  packingTime: z.number().min(0, 'Packing time cannot be negative').optional().default(8),
   stages: z.array(stageSchema)
     .min(1, 'At least one stage is required')
     .max(20, 'Maximum 20 stages allowed'),

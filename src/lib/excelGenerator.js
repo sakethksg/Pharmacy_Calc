@@ -17,6 +17,7 @@ export async function generateExcel({
   startDate,
   calculationResults,
   scheduleResults,
+  dispatchSchedule,
   efficiency,
 }) {
   const workbook = new ExcelJS.Workbook();
@@ -41,7 +42,12 @@ export async function generateExcel({
     createStageSheet(workbook, stage, calculationResults.stages[idx]);
   });
 
-  // Sheet N+1: Backward Calculation
+  // Sheet N+1: Dispatch Schedule (if available)
+  if (dispatchSchedule && dispatchSchedule.dispatches && dispatchSchedule.dispatches.length > 0) {
+    createDispatchSheet(workbook, dispatchSchedule);
+  }
+
+  // Sheet N+2: Backward Calculation
   createBackwardCalculationSheet(workbook, calculationResults);
 
   // Return buffer
@@ -146,14 +152,13 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
     { width: 20 }, // Analysis Done
     { width: 20 }, // Pack Time
     { width: 20 }, // Print Time
-    { width: 20 }, // Dispatch Time
     { width: 15 }, // Input
     { width: 15 }, // Output
     { width: 15 }, // Cumulative
   ];
 
   // Title
-  sheet.mergeCells('A1:J1');
+  sheet.mergeCells('A1:I1');
   const titleCell = sheet.getCell('A1');
   titleCell.value = `${stageSchedule.stageName} - Batch Schedule`;
   titleCell.font = { size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
@@ -179,7 +184,7 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
   };
 
   // Headers
-  const headers = ['Batch No', 'Start Time', 'Completion Time', 'Analysis Done', 'Pack Time', 'Print Time', 'Dispatch Time', 'Input (kg)', 'Output (kg)', 'Cumulative (kg)'];
+  const headers = ['Batch No', 'Start Time', 'Completion Time', 'Analysis Done', 'Pack Time', 'Print Time', 'Input (kg)', 'Output (kg)', 'Cumulative (kg)'];
   sheet.getRow(3).values = headers;
   sheet.getRow(3).font = { bold: true, color: { argb: 'FFFFFFFF' } };
   sheet.getRow(3).fill = {
@@ -200,7 +205,6 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
       batch.analysisDoneTimeFormatted,
       batch.packTimeFormatted,
       batch.printTimeFormatted,
-      batch.dispatchTimeFormatted,
       batch.inputQuantity,
       batch.outputQuantity,
       batch.cumulativeOutput,
@@ -219,7 +223,7 @@ function createStageSheet(workbook, stageSchedule, stageCalculation) {
   // Apply borders to all cells
   const lastRow = 3 + stageSchedule.batches.length;
   for (let row = 2; row <= lastRow; row++) {
-    for (let col = 1; col <= 10; col++) {
+    for (let col = 1; col <= 9; col++) {
       const cell = sheet.getCell(row, col);
       cell.border = {
         top: { style: 'thin' },
@@ -313,6 +317,99 @@ function createBackwardCalculationSheet(workbook, calculationResults) {
   const lastRow = 2 + calculationResults.stages.length;
   for (let row = 2; row <= lastRow; row++) {
     for (let col = 1; col <= 8; col++) {
+      const cell = sheet.getCell(row, col);
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    }
+  }
+}
+
+/**
+ * Create dispatch schedule sheet
+ */
+function createDispatchSheet(workbook, dispatchSchedule) {
+  const sheet = workbook.addWorksheet('Dispatch Schedule', {
+    views: [{ state: 'frozen', xSplit: 0, ySplit: 2 }]
+  });
+
+  // Set column widths
+  sheet.columns = [
+    { width: 15 }, // Dispatch Batch
+    { width: 20 }, // Packing Start
+    { width: 20 }, // Packing Complete
+    { width: 20 }, // Dispatch Ready
+    { width: 18 }, // Quantity
+    { width: 18 }, // Cumulative
+  ];
+
+  // Title
+  sheet.mergeCells('A1:F1');
+  const titleCell = sheet.getCell('A1');
+  titleCell.value = 'Dispatch & Packing Schedule';
+  titleCell.font = { size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
+  titleCell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFF59E0B' }, // Amber color
+  };
+  titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+  sheet.getRow(1).height = 25;
+
+  // Info row
+  sheet.getRow(2).values = [
+    'Batch Size:', `${dispatchSchedule.dispatchBatchQuantity} kg`,
+    'Packing Time:', `${dispatchSchedule.packingTimeHours} hrs`,
+    'Total Batches:', dispatchSchedule.totalBatches
+  ];
+  sheet.getRow(2).font = { bold: true };
+  sheet.getRow(2).fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFFEF3C7' },
+  };
+
+  // Headers
+  const headers = ['Dispatch Batch', 'Packing Start', 'Packing Complete', 'Dispatch Ready', 'Quantity (kg)', 'Cumulative (kg)'];
+  sheet.getRow(3).values = headers;
+  sheet.getRow(3).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+  sheet.getRow(3).fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFD97706' },
+  };
+  sheet.getRow(3).alignment = { horizontal: 'center', vertical: 'middle' };
+  sheet.getRow(3).height = 20;
+
+  // Data rows
+  dispatchSchedule.dispatches.forEach((dispatch, idx) => {
+    const rowNum = 4 + idx;
+    sheet.getRow(rowNum).values = [
+      dispatch.dispatchBatchId,
+      dispatch.packingStartTimeFormatted,
+      dispatch.packingCompleteTimeFormatted,
+      dispatch.dispatchReadyTimeFormatted,
+      dispatch.quantityPacked.toFixed(2),
+      dispatch.cumulativeDispatched.toFixed(2),
+    ];
+
+    // Alternate row colors
+    if (idx % 2 === 0) {
+      sheet.getRow(rowNum).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFEF3C7' },
+      };
+    }
+  });
+
+  // Apply borders to all cells
+  const lastRow = 3 + dispatchSchedule.dispatches.length;
+  for (let row = 2; row <= lastRow; row++) {
+    for (let col = 1; col <= 6; col++) {
       const cell = sheet.getCell(row, col);
       cell.border = {
         top: { style: 'thin' },
