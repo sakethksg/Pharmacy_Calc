@@ -71,11 +71,11 @@ export function scheduleBatches(calculationResults, startDate) {
         batchNumber: batchNum,
         batchId: `#${String(batchNum).padStart(3, '0')}`,
         startTime: batchStartTime,
-        startTimeFormatted: format(batchStartTime, 'dd-MM-yyyy HH:mm'),
+        startTimeFormatted: format(batchStartTime, 'dd-MM-yyyy'),
         completionTime: completionTime,
-        completionTimeFormatted: format(completionTime, 'dd-MM-yyyy HH:mm'),
+        completionTimeFormatted: format(completionTime, 'dd-MM-yyyy'),
         analysisDoneTime: analysisDoneTime,
-        analysisDoneTimeFormatted: format(analysisDoneTime, 'dd-MM-yyyy HH:mm'),
+        analysisDoneTimeFormatted: format(analysisDoneTime, 'dd-MM-yyyy'),
         inputQuantity: stage.inputPerBatch,
         outputQuantity: stage.outputPerBatch,
         cumulativeOutput: cumulativeOutput,
@@ -151,8 +151,8 @@ function waitForMaterial(upstreamBatches, materialNeeded, earliestTime) {
  */
 export function formatScheduleSummary(schedule) {
   return {
-    startDate: format(schedule.startDate, 'dd-MM-yyyy HH:mm'),
-    endDate: format(schedule.endDate, 'dd-MM-yyyy HH:mm'),
+    startDate: format(schedule.startDate, 'dd-MM-yyyy'),
+    endDate: format(schedule.endDate, 'dd-MM-yyyy'),
     totalProductionTime: `${schedule.totalProductionTimeDays} days (${schedule.totalProductionTimeHours.toFixed(1)} hours)`,
     totalStages: schedule.stages.length,
     totalBatches: schedule.stages.reduce((sum, stage) => sum + stage.batches.length, 0),

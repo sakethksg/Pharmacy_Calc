@@ -85,8 +85,8 @@ function createSummarySheet(workbook, data) {
     ['Overproduction', `${data.efficiency.overproduction.toFixed(2)} kg (${data.efficiency.overproductionPercentage}%)`],
     ['', ''],
     ['Production Timeline', ''],
-    ['Start Date', format(data.scheduleResults.startDate, 'dd-MM-yyyy HH:mm')],
-    ['End Date', format(data.scheduleResults.endDate, 'dd-MM-yyyy HH:mm')],
+    ['Start Date', format(data.scheduleResults.startDate, 'dd-MM-yyyy')],
+    ['End Date', format(data.scheduleResults.endDate, 'dd-MM-yyyy')],
     ['Total Production Time', `${data.scheduleResults.totalProductionTimeDays} days`],
     ['', ''],
     ['Production Statistics', ''],
@@ -95,7 +95,7 @@ function createSummarySheet(workbook, data) {
     ['Overall Yield', `${data.efficiency.overallYieldPercentage}%`],
     ['Total Input Required', `${data.efficiency.totalInput.toFixed(2)} kg`],
     ['', ''],
-    ['Report Generated', format(new Date(), 'dd-MM-yyyy HH:mm:ss')],
+    ['Report Generated', format(new Date(), 'dd-MM-yyyy')],
   ];
 
   summaryData.forEach((row, idx) => {
