@@ -82,9 +82,6 @@ function InputField({ label, value, onChange, unit, icon: Icon, tooltip, error, 
             {unit}
           </span>
         )}
-        {isValid && !error && value > 0 && (
-          <CheckCircleIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-        )}
       </div>
       {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
     </div>

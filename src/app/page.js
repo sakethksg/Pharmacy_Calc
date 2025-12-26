@@ -354,16 +354,13 @@ export default function Home() {
                           setProductName(e.target.value);
                           validateField('productName', e.target.value);
                         }}
-                        className={`w-full px-4 py-3 pr-10 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all font-medium text-slate-900 ${
+                        className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all font-medium text-slate-900 ${
                           !fieldValidation.productName 
                             ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                             : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'
                         }`}
                         placeholder="e.g., Paracetamol 500mg"
                       />
-                      {fieldValidation.productName && productName && (
-                        <CheckCircleIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                      )}
                     </div>
                     {!fieldValidation.productName && (
                       <p className="text-xs text-red-600 mt-1 font-medium">Product name is required</p>
