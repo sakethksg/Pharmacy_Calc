@@ -270,23 +270,23 @@ export default function Home() {
               <h3 className="text-md font-bold text-slate-900 mb-3">Key Features</h3>
               <div className="space-y-2.5 text-sm">
                 <div className="flex items-start gap-2.5">
-                  <CheckCircleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-blue-600 font-bold">•</span>
                   <span className="text-slate-700">Backward calculation from final output</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <CheckCircleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-blue-600 font-bold">•</span>
                   <span className="text-slate-700">Time-based scheduling with dependencies</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <CheckCircleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-blue-600 font-bold">•</span>
                   <span className="text-slate-700">Material flow management</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <CheckCircleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-blue-600 font-bold">•</span>
                   <span className="text-slate-700">Automated dispatch scheduling</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <CheckCircleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-blue-600 font-bold">•</span>
                   <span className="text-slate-700">Professional Excel exports</span>
                 </div>
               </div>
@@ -306,8 +306,7 @@ export default function Home() {
             {results && (
               <div className="border-t-2 border-slate-200 pt-6">
                 <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-lg border-2 border-emerald-200">
-                  <div className="flex items-center gap-2.5 mb-2">
-                    <CheckCircleIcon className="w-5 h-5 text-emerald-600" />
+                  <div className="mb-2">
                     <span className="font-semibold text-emerald-900">Results Ready</span>
                   </div>
                   <p className="text-sm text-emerald-800">Scroll down to view batch schedules and download reports</p>
