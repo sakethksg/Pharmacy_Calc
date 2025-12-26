@@ -15,7 +15,7 @@ export default function StageInput({ stages, onChange }) {
       inputPerBatch: 100,
       outputPerBatch: 100,
       frequency: 24,
-      duration: 24,
+      duration: 8,
       analysisDuration: 24,
       packTime: 0,
     };
