@@ -18,7 +18,8 @@ import {
   BeakerIcon,
   CubeIcon,
   CheckCircleIcon,
-  QuestionMarkCircleIcon
+  QuestionMarkCircleIcon,
+  TruckIcon
 } from './Icons';
 
 function Tooltip({ children, text }) {
@@ -88,7 +89,7 @@ function InputField({ label, value, onChange, unit, icon: Icon, tooltip, error, 
   );
 }
 
-function StageCard({ stage, index, updateStage, removeStage, duplicateStage, canRemove, totalStages }) {
+function StageCard({ stage, index, updateStage, removeStage, duplicateStage, canRemove, totalStages, isLastStage }) {
   const [isExpanded, setIsExpanded] = useState(index < 2); // First 2 expanded by default
 
   return (
@@ -225,6 +226,38 @@ function StageCard({ stage, index, updateStage, removeStage, duplicateStage, can
             />
           </div>
 
+          {/* Dispatch Fields - Only for Last Stage */}
+          {isLastStage && (
+            <div className="mt-6 pt-6 border-t-2 border-blue-200 bg-blue-50/50 -m-5 p-5 rounded-b-lg">
+              <div className="flex items-center gap-2 mb-4">
+                <TruckIcon className="w-5 h-5 text-blue-600" />
+                <h4 className="text-lg font-bold text-blue-900">Dispatch Configuration (Final Stage)</h4>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <InputField
+                  label="Dispatch Batch Quantity"
+                  value={stage.dispatchBatchQuantity || 500}
+                  onChange={(val) => updateStage(index, 'dispatchBatchQuantity', val)}
+                  unit="kg"
+                  icon={TruckIcon}
+                  tooltip="Quantity per dispatch batch"
+                  colorClass="blue"
+                />
+
+                <InputField
+                  label="Packing Time"
+                  value={stage.packingTime || 8}
+                  onChange={(val) => updateStage(index, 'packingTime', val)}
+                  unit="hrs"
+                  icon={ClockIcon}
+                  tooltip="Time required to pack a dispatch batch"
+                  colorClass="blue"
+                  step="0.5"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Quick Stats */}
           <div className="mt-5 pt-5 border-t border-slate-200">
             <div className="flex flex-wrap gap-4 text-sm">
@@ -256,6 +289,15 @@ export default function StageInput({ stages, onChange }) {
   const addStage = () => {
     if (stages.length >= 20) return;
     
+    // Remove dispatch fields from the previous last stage (if any)
+    const updatedStages = stages.map((stage, index) => {
+      if (index === stages.length - 1) {
+        const { dispatchBatchQuantity, packingTime, ...stageWithoutDispatch } = stage;
+        return stageWithoutDispatch;
+      }
+      return stage;
+    });
+    
     const newStage = {
       id: Date.now(),
       name: `Stage-${stages.length + 1}`,
@@ -265,13 +307,28 @@ export default function StageInput({ stages, onChange }) {
       duration: 8,
       analysisDuration: 24,
       packTime: 0,
+      // Add dispatch fields to the new last stage
+      dispatchBatchQuantity: 500,
+      packingTime: 8,
     };
-    onChange([...stages, newStage]);
+    onChange([...updatedStages, newStage]);
   };
 
   const removeStage = (index) => {
     if (stages.length > 1) {
-      onChange(stages.filter((_, i) => i !== index));
+      const filteredStages = stages.filter((_, i) => i !== index);
+      // Ensure the new last stage has dispatch fields
+      const updatedStages = filteredStages.map((stage, idx) => {
+        if (idx === filteredStages.length - 1 && !stage.dispatchBatchQuantity) {
+          return {
+            ...stage,
+            dispatchBatchQuantity: 500,
+            packingTime: 8,
+          };
+        }
+        return stage;
+      });
+      onChange(updatedStages);
     }
   };
 
@@ -279,12 +336,26 @@ export default function StageInput({ stages, onChange }) {
     if (stages.length >= 20) return;
     
     const stageToDuplicate = stages[index];
+    
+    // Remove dispatch fields from the previous last stage
+    const updatedStages = stages.map((stage, idx) => {
+      if (idx === stages.length - 1) {
+        const { dispatchBatchQuantity, packingTime, ...stageWithoutDispatch } = stage;
+        return stageWithoutDispatch;
+      }
+      return stage;
+    });
+    
     const newStage = {
       ...stageToDuplicate,
       id: Date.now(),
       name: `${stageToDuplicate.name} (Copy)`,
+      // Always add dispatch fields to the new last stage
+      dispatchBatchQuantity: stageToDuplicate.dispatchBatchQuantity || 500,
+      packingTime: stageToDuplicate.packingTime || 8,
     };
-    onChange([...stages, newStage]);
+    
+    onChange([...updatedStages, newStage]);
   };
 
   const updateStage = (index, field, value) => {
@@ -344,6 +415,7 @@ export default function StageInput({ stages, onChange }) {
             duplicateStage={duplicateStage}
             canRemove={stages.length > 1}
             totalStages={stages.length}
+            isLastStage={index === stages.length - 1}
           />
         ))}
       </div>

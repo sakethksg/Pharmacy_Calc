@@ -23,10 +23,10 @@ export function scheduleDispatches(finalStageBatches, dispatchBatchQuantity, pac
   let dispatchBatchNumber = 1;
   let productionQueue = [];
 
-  // Build queue of when product becomes available (after print time)
+  // Build queue of when product becomes available (after packing)
   finalStageBatches.forEach(batch => {
     productionQueue.push({
-      availableTime: batch.printTime, // Product available after printing
+      availableTime: batch.packTime, // Product available after packing
       quantity: batch.outputQuantity,
     });
   });

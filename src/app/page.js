@@ -37,8 +37,6 @@ export default function Home() {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  const [dispatchBatchQuantity, setDispatchBatchQuantity] = useState(500);
-  const [packingTime, setPackingTime] = useState(8);
   
   const [stages, setStages] = useState([
     {
@@ -60,6 +58,9 @@ export default function Home() {
       duration: 8,
       analysisDuration: 24,
       packTime: 0,
+      // Dispatch fields only for last stage
+      dispatchBatchQuantity: 500,
+      packingTime: 8,
     },
   ]);
 
@@ -95,9 +96,7 @@ export default function Home() {
   // Validation helpers
   const [fieldValidation, setFieldValidation] = useState({
     productName: true,
-    targetOutput: true,
-    dispatchBatchQuantity: true,
-    packingTime: true
+    targetOutput: true
   });
 
   const validateField = (field, value) => {
@@ -108,8 +107,6 @@ export default function Home() {
         isValid = value && value.trim().length > 0;
         break;
       case 'targetOutput':
-      case 'dispatchBatchQuantity':
-      case 'packingTime':
         isValid = value > 0;
         break;
     }
@@ -122,10 +119,24 @@ export default function Home() {
     // Validate all fields
     const isProductNameValid = validateField('productName', productName);
     const isTargetOutputValid = validateField('targetOutput', targetOutput);
-    const isDispatchValid = validateField('dispatchBatchQuantity', dispatchBatchQuantity);
-    const isPackingValid = validateField('packingTime', packingTime);
 
-    if (!isProductNameValid || !isTargetOutputValid || !isDispatchValid || !isPackingValid) {
+    // Get dispatch settings from last stage
+    const lastStage = stages[stages.length - 1];
+    const dispatchBatchQuantity = lastStage.dispatchBatchQuantity || 500;
+    const packingTime = lastStage.packingTime || 8;
+
+    // Validate dispatch settings
+    if (!dispatchBatchQuantity || dispatchBatchQuantity <= 0) {
+      toast.error('Last stage must have valid dispatch batch quantity');
+      return;
+    }
+
+    if (!packingTime || packingTime <= 0) {
+      toast.error('Last stage must have valid packing time');
+      return;
+    }
+
+    if (!isProductNameValid || !isTargetOutputValid) {
       toast.error('Please fill in all required fields correctly');
       return;
     }
@@ -136,8 +147,9 @@ export default function Home() {
     setResults(null);
 
     try {
-      // Remove the 'id' field from stages before sending to API
-      const cleanStages = stages.map(({ id, ...stage }) => stage);
+      // Remove the 'id', 'dispatchBatchQuantity', and 'packingTime' fields from stages before sending to API
+      // These dispatch fields are sent separately at the root level
+      const cleanStages = stages.map(({ id, dispatchBatchQuantity: _, packingTime: __, ...stage }) => stage);
       
       const response = await fetch('/api/calculate', {
         method: 'POST',
@@ -231,11 +243,11 @@ export default function Home() {
               <div className="space-y-3 text-sm">
                 <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">
                   <p className="font-semibold text-slate-900 mb-1.5">1. Input Details</p>
-                  <p className="text-slate-700">Enter product name, target output, start date, dispatch quantity, and packing time</p>
+                  <p className="text-slate-700">Enter product name, target output, and start date</p>
                 </div>
                 <div className="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-600">
                   <p className="font-semibold text-slate-900 mb-1.5">2. Configure Stages</p>
-                  <p className="text-slate-700">Add/edit production stages with batch parameters</p>
+                  <p className="text-slate-700">Add/edit production stages with batch parameters. Set dispatch options in the last stage only.</p>
                 </div>
                 <div className="bg-violet-50 p-4 rounded-lg border-l-4 border-violet-600">
                   <p className="font-semibold text-slate-900 mb-1.5">3. Calculate</p>
@@ -298,7 +310,7 @@ export default function Home() {
                 <p><strong className="text-slate-900">Stages:</strong> Maximum 20 stages supported</p>
                 <p><strong className="text-slate-900">Time Values:</strong> All durations in hours</p>
                 <p><strong className="text-slate-900">Frequency:</strong> Must be ≥ duration</p>
-                <p><strong className="text-slate-900">Dispatch:</strong> Product accumulates, packs, then dispatches</p>
+                <p><strong className="text-slate-900">Dispatch:</strong> Only configured in the last stage - product accumulates, packs, then dispatches</p>
                 <p><strong className="text-slate-900">Dates:</strong> YYYY-MM-DD format</p>
               </div>
             </div>
@@ -338,7 +350,7 @@ export default function Home() {
               </div>
               <div className="p-8">
                 {/* Basic Info - Professional Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                   <div className="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 hover:border-blue-400 transition-all">
                     <label className="block text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
                       <CubeIcon className="w-4 h-4 text-blue-600" />
@@ -409,62 +421,6 @@ export default function Home() {
                       onChange={(e) => setStartDate(e.target.value)}
                       className="w-full px-4 py-3 bg-white border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all font-medium text-slate-900"
                     />
-                  </div>
-
-                  <div className="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 hover:border-amber-400 transition-all">
-                    <label className="block text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                      <TruckIcon className="w-4 h-4 text-amber-600" />
-                      Dispatch Batch
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={dispatchBatchQuantity}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value) || 0;
-                          setDispatchBatchQuantity(val);
-                          validateField('dispatchBatchQuantity', val);
-                        }}
-                        className={`w-full px-4 py-3 pr-12 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all font-medium text-slate-900 ${
-                          !fieldValidation.dispatchBatchQuantity 
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                            : 'border-slate-300 focus:ring-amber-500 focus:border-amber-500'
-                        }`}
-                        min="0"
-                        step="0.01"
-                        placeholder="500"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-500">kg</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 hover:border-orange-400 transition-all">
-                    <label className="block text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                      <ClockIcon className="w-4 h-4 text-orange-600" />
-                      Packing Time
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={packingTime}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value) || 0;
-                          setPackingTime(val);
-                          validateField('packingTime', val);
-                        }}
-                        className={`w-full px-4 py-3 pr-12 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all font-medium text-slate-900 ${
-                          !fieldValidation.packingTime 
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                            : 'border-slate-300 focus:ring-orange-500 focus:border-orange-500'
-                        }`}
-                        min="0"
-                        step="0.5"
-                        placeholder="8"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-500">hrs</span>
-                    </div>
                   </div>
                 </div>
 

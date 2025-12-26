@@ -88,7 +88,6 @@ export default function ResultsTable({ results }) {
                   <th className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Completion Time</th>
                   <th className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Analysis Done</th>
                   <th className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Pack Time</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Print Time</th>
                   <th className="px-4 py-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">Input (kg)</th>
                   <th className="px-4 py-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">Output (kg)</th>
                   <th className="px-4 py-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">Cumulative (kg)</th>
@@ -105,7 +104,6 @@ export default function ResultsTable({ results }) {
                     <td className="px-4 py-3 text-sm text-slate-700">{batch.completionTimeFormatted}</td>
                     <td className="px-4 py-3 text-sm text-slate-700">{batch.analysisDoneTimeFormatted}</td>
                     <td className="px-4 py-3 text-sm text-slate-700">{batch.packTimeFormatted}</td>
-                    <td className="px-4 py-3 text-sm text-slate-700">{batch.printTimeFormatted}</td>
                     <td className="px-4 py-3 text-sm text-right text-slate-700">{batch.inputQuantity}</td>
                     <td className="px-4 py-3 text-sm text-right text-slate-700">{batch.outputQuantity}</td>
                     <td className="px-4 py-3 text-sm text-right font-bold text-slate-900">{batch.cumulativeOutput}</td>
